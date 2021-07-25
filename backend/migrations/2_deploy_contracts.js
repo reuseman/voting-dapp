@@ -27,7 +27,7 @@ module.exports = async function (deployer, network, accounts) {
   await deployer.deploy(SULToken, initialCoins);
   const SULTokenIstance = await SULToken.deployed();
 
-  await deployer.deploy(Mayor, candidates, escrow, 3, SULTokenIstance.address);
+  await deployer.deploy(Mayor, candidates, escrow, 2, SULTokenIstance.address);
   const MayorInstance = await Mayor.deployed();
 
   // Move minted coin over the Mayor contract

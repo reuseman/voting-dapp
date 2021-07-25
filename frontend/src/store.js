@@ -15,5 +15,6 @@ export const candidates = writable([]);
 export const voted = writableStorage("voted", "");
 export const route = writableStorage("routes", {});
 
-// export const avatarProvider = "https://avatars.dicebear.com/api/avataaars/"
-export const avatarProvider = "https://joeschmoe.io/api/v1/";
+export const avatarProvider = "https://avatars.dicebear.com/api/avataaars/";
+// export const avatarProvider = "https://joeschmoe.io/api/v1/";
+export const sigilProvider = "https://avatars.dicebear.com/api/jdenticon/";

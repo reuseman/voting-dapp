@@ -1,7 +1,7 @@
 <script>
-  import { defaultChainStore, selectedAccount, connected } from "svelte-web3";
+  import { defaultChainStore, connected } from "svelte-web3";
   import { onMount, createEventDispatcher } from "svelte";
-  import { fly, blur, fade } from "svelte/transition";
+  import { fade } from "svelte/transition";
 
   const dispatch = createEventDispatcher();
 

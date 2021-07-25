@@ -1,7 +1,7 @@
 <script>
+  import { createEventDispatcher, onMount } from "svelte";
   import {
     candidates,
-    envelopes_casted,
     envelopes_opened,
     quorum,
     outcome_announced,
@@ -13,40 +13,48 @@
 
   import Candidate from "../components/Candidate.svelte";
 
-  export let mayor, updateStats;
-  let modal;
+  export let mayor;
   let orderedCandidates = [];
+  let candidates_called = false;
+
+  const dispatch = createEventDispatcher();
 
   $: if ($envelopes_opened != 0 && $envelopes_opened >= $quorum) {
-    // TODO check if updateStats() is needed
     if ($outcome_announced == false) {
       mayor.methods.mayor_or_sayonara().send({ from: $selectedAccount });
     }
-
-    console.log("Outcome announced: " + $outcome_announced);
-    console.log("Winner is: " + $winner);
   }
 
   $: if ($outcome_announced && $candidates.length) {
-    getOrderedCandidates();
+    if (!candidates_called) {
+      getOrderedCandidates();
+      dispatch("completed", { success: true });
+      candidates_called = true;
+    }
   }
 
   const getOrderedCandidates = async () => {
+    let temp = [];
     for (let candidate of $candidates) {
       let res = await mayor.methods
         .candidates_state(candidate)
         .call({ from: $selectedAccount });
-      orderedCandidates.push({
+      temp.push({
         address: candidate,
         soul: res.soul,
         votes: res.votes,
         winner: candidate == $winner,
       });
     }
-    orderedCandidates = orderedCandidates.sort(
-      (a, b) => b.sul - a.sul || b.votes - a.votes
-    );
+    orderedCandidates = temp.sort((a, b) => b.sul - a.sul || b.votes - a.votes);
   };
+
+  onMount(() => {
+    // window.$("#bar").progress({
+    //   percent: ($envelopes_opened / $quorum) * 100,
+    //   total: $quorum,
+    // });
+  });
 </script>
 
 <div
@@ -55,13 +63,29 @@
   out:fade={{ duration: 400, delay: 400 }}
   on:outroend
 >
-  {#if $envelopes_opened != 0 && envelopes_opened >= quorum}
-    {#if $outcome_announced}
-      {#if $winner == $web3.utils.toBN($winner).isZero()}
-        TIE
+  <!-- <div class="ui blue progress" id="bar">
+    <div class="bar" />
+    <div class="label">{$envelopes_opened}/{$quorum} Opened Votes</div>
+  </div>
+  <div class="ui divider hidden" /> -->
+  {#if $outcome_announced}
+    {#if $envelopes_opened != 0 && envelopes_opened >= quorum}
+      {#if $web3.utils.toBN($winner).isZero()}
         <h2 class="ui center aligned header" style="margin-top: 0;">
           It's a tie!
         </h2>
+        <div class="ui special centered cards" transition:blur>
+          {#each orderedCandidates as candidate}
+            <Candidate
+              address={candidate.address}
+              votes={candidate.votes}
+              soul={candidate.soul}
+              hoverEnabled={false}
+              winner={candidate.winner}
+              voted={$voted == candidate.address}
+            />
+          {/each}
+        </div>
       {:else}
         <h2 class="ui center aligned header" style="margin-top: 0;">
           The winner is...
@@ -79,14 +103,10 @@
           {/each}
         </div>
       {/if}
-    {:else}
-      <h2 class="ui center aligned header" style="margin-top: 0;">
-        Results not announced yet
-      </h2>
     {/if}
   {:else}
     <h2 class="ui center aligned icon header">
-      <i class="sync icon loading" />
+      <i class="sync blue icon loading" />
       <div class="content">
         Wait for Results
         <div class="sub header">{$envelopes_opened}/{$quorum}</div>

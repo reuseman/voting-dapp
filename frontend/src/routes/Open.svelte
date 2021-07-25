@@ -1,13 +1,20 @@
 <script>
   import { createEventDispatcher } from "svelte";
   import { fade } from "svelte/transition";
-  import { candidates, envelopes_casted, quorum, voted } from "./../store.js";
+  import {
+    candidates,
+    candidates_number,
+    envelopes_casted,
+    quorum,
+    voted,
+  } from "./../store.js";
   import { selectedAccount, web3 } from "svelte-web3";
 
   import Candidate from "../components/Candidate.svelte";
+  import CandidatePlaceholder from "../components/CandidatePlaceholder.svelte";
   import Modal from "../components/Modal.svelte";
 
-  export let mayor, sul, mayorAddress;
+  export let mayor, sul, mayorAddress, toggleLoader;
   let modal;
 
   const dispatch = createEventDispatcher();
@@ -19,7 +26,6 @@
 
     if (event.success) {
       try {
-        // TODO rimuovere campi inutili dal modal
         let envelope = await mayor.methods
           .compute_envelope(event.sigil, event.address, event.soul)
           .call({ from: $selectedAccount });
@@ -31,18 +37,18 @@
           .send({ from: $selectedAccount, value: event.soul });
 
         if (res.status && res.events.hasOwnProperty("EnvelopeOpen")) {
-          window.$("#open-loader").dimmer("hide");
+          toggleLoader("hide");
           dispatch("opened", { success: true });
           $voted = event.address;
         } else {
           console.error(res);
-          window.$("#open-loader").dimmer("hide");
+          toggleLoader("hide");
           console.log(
             "ERRORE REGISTRAZINE: la chiamata `e andata abuon fine ma c' `e un errore comunque"
           );
         }
       } catch (err) {
-        window.$("#open-loader").dimmer("hide");
+        toggleLoader("hide");
         console.log("ERRORE REGISTRAZIONE");
         console.error(err);
         if (err.code === 4001) {
@@ -62,30 +68,31 @@
 
 <div
   class="ui basic segment"
-  id="open-loader"
   in:fade={{ duration: 200, delay: 200 }}
   out:fade={{ duration: 400, delay: 400 }}
   on:outroend
 >
-  <div class="ui dimmer">
-    <div class="ui text loader">Opening</div>
-  </div>
-
-  {#if envelopes_casted >= quorum}
+  {#if $envelopes_casted >= $quorum && $quorum > 0}
     <div class="ui special centered cards">
-      {#each $candidates as candidate}
-        <Candidate
-          address={candidate}
-          on:click={() => {
-            modal.show({ candidate });
-          }}
-          button={"Open"}
-        />
-      {/each}
+      {#if $candidates_number > 0}
+        {#each $candidates as candidate}
+          <Candidate
+            address={candidate}
+            on:click={() => {
+              modal.show({ candidate });
+            }}
+            button={"Open"}
+          />
+        {/each}
+      {:else}
+        {#each [1, 2, 3] as candidate}
+          <CandidatePlaceholder />
+        {/each}
+      {/if}
     </div>
   {:else}
     <h2 class="ui center aligned icon header">
-      <i class="sync icon loading" />
+      <i class="sync blue icon loading" />
       <div class="content">
         Wait for Quorum
         <div class="sub header">{$envelopes_casted}/{$quorum}</div>

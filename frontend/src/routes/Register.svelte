@@ -1,12 +1,13 @@
 <script>
   import { selectedAccount, connected, web3 } from "svelte-web3";
-  import { createEventDispatcher } from "svelte";
+  import { createEventDispatcher, onMount } from "svelte";
   import { fade } from "svelte/transition";
 
   const dispatch = createEventDispatcher();
 
   export let mayor = null;
   export let toggleLoader;
+  export let showMessage;
   let error = null;
 
   const registerHandler = async () => {
@@ -31,7 +32,10 @@
       console.log(err);
       // console.log(err["value"]["data"]["message"].includes("The voter already received the soul"))
       if (err.code === 4001) {
-        console.log("devi accettare sgobbato");
+        showMessage(
+          "You must accept the request!",
+          "In order to receive the Soul you need to accept the request from your provider."
+        );
       }
     }
   };

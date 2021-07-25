@@ -15,7 +15,6 @@ contract Mayor {
     }
     
     // Store refund data
-    // TODO move registered option here?
     struct Refund {
         uint soul;
         address candidate;
@@ -34,11 +33,7 @@ contract Mayor {
     event Tie(address _escrow);
     event EnvelopeCast(address _voter);
     event EnvelopeOpen(address _voter, uint _soul, address _candidate);
-    event HoBalance(uint _amount);
-    event MyAddr(address _my);
     event Registered(address _voter);
-    event PRICE(uint price);
-    event SOUL(uint _soul);
 
     // Someone can register to receive the SOUL only one time
     modifier canRegister() {
@@ -93,7 +88,6 @@ contract Mayor {
 
         // Init ERC20 SUL token
         sul = SULToken(_SULtoken);
-        emit MyAddr(_SULtoken);
 
         // Init voting variables
         for (uint i = 0; i < _candidates.length; i++) {
@@ -128,10 +122,7 @@ contract Mayor {
     /// @param _candidate (address) The voting preference
     /// @dev The soul is sent as ERC20 token
     /// @dev Need to recompute the hash to validate the envelope previously casted
-    function open_envelope(uint _sigil, address _candidate) canOpen external payable {
-
-        emit SOUL(msg.value);
-        
+    function open_envelope(uint _sigil, address _candidate) canOpen external payable {        
         require(envelopes[msg.sender] != 0x0, "The sender has not casted any votes");
         require(souls[msg.sender].soul == 0, "The sender has already opened the envelope");
         
@@ -140,7 +131,6 @@ contract Mayor {
         require(_casted_envelope == _sent_envelope, "Sent envelope does not correspond to the one casted");
 
         // Payment
-        emit PRICE(sul.allowance(msg.sender, address(this)));
         require(sul.allowance(msg.sender, address(this)) == msg.value, "The value must be the same of the envelope");
         require(sul.transferFrom(msg.sender, address(this), msg.value));
 
@@ -193,7 +183,7 @@ contract Mayor {
 
     }
 
-    function find_candidate_with_max_soul() private returns (address payable, uint) {
+    function find_candidate_with_max_soul() private view returns (address payable, uint) {
         // Check winner
         address probable_winner;
         uint max_soul = 0;

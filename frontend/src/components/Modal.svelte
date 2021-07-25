@@ -1,6 +1,6 @@
 <script>
   import { createEventDispatcher } from "svelte";
-  import { avatarProvider } from "./../store";
+  import { avatarProvider, sigilProvider } from "./../store";
   const dispatch = createEventDispatcher();
 
   export let title = "";
@@ -26,20 +26,25 @@
       soul: soul,
     });
   };
-
-  // TODO add random image generator for sigil
 </script>
 
 <div class="ui modal">
   <i class="close icon" />
   <div class="header">{title}</div>
+
   <div class="image content">
     <div class="ui medium image">
-      <img src="{avatarProvider}{address}.svg" loading="lazy" />
+      <img src="{avatarProvider}{address}.svg" alt="Mayor face" />
     </div>
     <div class="description">
       <div class="ui header">{prompt}</div>
-
+      <p>
+        <img
+          class="ui tiny centered image"
+          src="{sigilProvider}{sigil}.svg"
+          alt="Sigil"
+        />
+      </p>
       <form class="ui form">
         <div class="field">
           <label for="sigil">Sigil</label>

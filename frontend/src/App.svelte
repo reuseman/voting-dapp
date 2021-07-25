@@ -1,6 +1,6 @@
 <script>
   import { web3, selectedAccount, connected } from "svelte-web3";
-  import { onMount } from "svelte";
+  import { onMount, onDestroy } from "svelte";
   import {
     balance,
     candidates,
@@ -21,6 +21,7 @@
   import Nav from "./components/Nav.svelte";
   import Statistics from "./components/Statistics.svelte";
   import Steps from "./components/Steps.svelte";
+  import Message from "./components/Message.svelte";
 
   import Web3Provider from "./routes/Web3Provider.svelte";
   import Register from "./routes/Register.svelte";
@@ -33,6 +34,8 @@
   let sul,
     mayor = null;
   let steps;
+  let showMessage;
+  let subscription;
 
   onMount(() => {
     steps.activate(0);
@@ -44,23 +47,48 @@
     });
   });
 
+  onDestroy(() => {
+    unsubscribe();
+  });
+
+  function unsubscribe() {
+    if (subscription) {
+      subscription.unsubscribe();
+    }
+  }
+
   $: if ($connected) {
     sul = new $web3.eth.Contract(sulContract.abi, addresses.sul);
     mayor = new $web3.eth.Contract(mayorContract.abi, addresses.mayor);
-  }
 
-  $: if ($outcome_announced && currentRoute != routes[4]) {
-    $route[$selectedAccount] = routes[4];
-    changeRoute();
-  }
+    window.mayor = mayor;
 
-  function firstRoute(e) {
-    if (e.detail.success) {
+    subscription = $web3.eth.subscribe("logs", {}, (err, event) => {
+      if (!err) console.log(event);
+    });
+
+    subscription.on("data", (event) => {
+      console.log("Subscription");
+      console.log(event);
       compute();
+    });
+  }
+
+  // $: if ($outcome_announced && currentRoute != routes[4]) {
+  //   $route[$selectedAccount] = routes[4];
+  //   changeRoute();
+  // }
+
+  async function firstRoute(e) {
+    if (e.detail.success) {
+      await compute();
       let old = $route;
       if (!$route[$selectedAccount]) {
         old[$selectedAccount] = routes[1];
         route.set(old);
+      }
+      if ($outcome_announced) {
+        $route[$selectedAccount] = routes[4];
       }
       currentRoute = "empty";
     }
@@ -90,6 +118,10 @@
     $balance = await sul.methods
       .balanceOf($selectedAccount)
       .call({ from: $selectedAccount });
+
+    console.log(
+      await mayor.methods.candidates_number().call({ from: $selectedAccount })
+    );
 
     let voting_condition = await mayor.methods.voting_condition().call();
     $quorum = voting_condition.quorum;
@@ -121,7 +153,7 @@
       <div class="ten wide column">
         <div class="ui segment" id="loader">
           <div class="ui dimmer">
-            <div class="ui text loader">Collecting</div>
+            <div class="ui text loader">Loading</div>
           </div>
 
           {#if currentRoute == routes[0]}
@@ -134,25 +166,38 @@
             <Register
               {mayor}
               {toggleLoader}
+              {showMessage}
               on:register={nextRoute}
               on:outroend={changeRoute}
             />
           {:else if currentRoute == routes[2]}
-            <Cast {mayor} on:casted={nextRoute} on:outroend={changeRoute} />
+            <Cast
+              {mayor}
+              {toggleLoader}
+              on:casted={nextRoute}
+              on:outroend={changeRoute}
+            />
           {:else if currentRoute == routes[3]}
             <Open
               {mayor}
               {sul}
               mayorAddress={addresses.mayor}
+              updateStats={compute}
+              {toggleLoader}
               on:opened={nextRoute}
               on:outroend={changeRoute}
             />
           {:else if currentRoute == routes[4]}
-            <Result {mayor} updateStats={compute} />
+            <Result {mayor} on:completed={unsubscribe} />
           {/if}
         </div>
       </div>
       <div class="right floated three wide column" />
+    </div>
+    <div class="middle aligned stretched row">
+      <div class="ten wide centered column">
+        <Message bind:show={showMessage} />
+      </div>
     </div>
   </div>
 </div>

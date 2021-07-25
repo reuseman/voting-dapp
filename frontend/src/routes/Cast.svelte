@@ -2,19 +2,20 @@
   import { createEventDispatcher } from "svelte";
   import { candidates, candidates_number } from "./../store.js";
   import { selectedAccount } from "svelte-web3";
-  import { fly, blur, fade } from "svelte/transition";
+  import { fade } from "svelte/transition";
 
   import Candidate from "../components/Candidate.svelte";
   import CandidatePlaceholder from "../components/CandidatePlaceholder.svelte";
   import Modal from "../components/Modal.svelte";
 
   export let mayor;
+  export let toggleLoader;
   let modal;
 
   const dispatch = createEventDispatcher();
 
   const castHandler = async (e) => {
-    window.$("#cast-loader").dimmer("show");
+    toggleLoader("show");
     console.debug(e);
     let event = e.detail;
 
@@ -30,17 +31,17 @@
 
         console.debug(res);
         if (res.status && res.events.hasOwnProperty("EnvelopeCast")) {
-          window.$("#cast-loader").dimmer("hide");
+          toggleLoader("hide");
           dispatch("casted", { success: true });
         } else {
           console.error(res);
-          window.$("#cast-loader").dimmer("hide");
+          toggleLoader("hide");
           console.log(
             "ERRORE REGISTRAZINE: la chiamata `e andata abuon fine ma c' `e un errore comunque"
           );
         }
       } catch (err) {
-        window.$("#cast-loader").dimmer("hide");
+        toggleLoader("hide");
         console.log("ERRORE REGISTRAZIONE");
         console.error(err);
         if (err.code === 4001) {
@@ -60,19 +61,14 @@
 
 <div
   class="ui basic segment"
-  id="cast-loader"
   in:fade={{ duration: 200, delay: 200 }}
   out:fade={{ duration: 400, delay: 400 }}
   on:outroend
 >
-  <div class="ui dimmer">
-    <div class="ui text loader">Casting</div>
-  </div>
-
   <h2 class="ui center aligned header" style="margin-top: 0;">
     Cast your envelope
   </h2>
-  <div class="ui special centered cards" in:fade out:fade>
+  <div class="ui special centered cards">
     {#if $candidates_number}
       {#each $candidates as candidate}
         <Candidate

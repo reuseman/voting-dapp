@@ -36,7 +36,11 @@
         </div>
       </div>
     </div>
-    <img src="{avatarProvider}{address}.svg" loading="lazy" />
+    <img
+      src="{avatarProvider}{address}.svg"
+      loading="lazy"
+      alt="Avatar of {address}"
+    />
     {#if winner}
       <div class="ui top right attached blue label">
         <i class="icon chess king" /> Mayor

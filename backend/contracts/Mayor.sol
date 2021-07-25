@@ -63,21 +63,23 @@ contract Mayor {
     }
 
     // STATE ATTRIBUTES
-    
-    // Initialization variables
-    address[] public candidates;
-    address payable public escrow;
-    mapping(address => bool) registered;
     SULToken private sul;
-    
-    // Voting phase variables
-    mapping(address => bytes32) envelopes;
+        
+    // Candidates
+    address[] public candidates;
     mapping(address => Candidate) public candidates_state;
-    Conditions public voting_condition;
 
-    // Refund phase variables
-    mapping(address => Refund) souls;
+    // Escrow
+    address payable public escrow;
+
+    // Voters
     address[] voters;
+    mapping(address => bool) registered;
+    mapping(address => bytes32) envelopes;
+    
+    // Results and refund variables
+    Conditions public voting_condition;
+    mapping(address => Refund) souls;
 
     /// @notice The constructor only initializes internal variables
     /// @param _candidates (array) The addresses of the mayor candidates

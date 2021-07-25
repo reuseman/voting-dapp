@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "ganache": "ganache-cli -d -m='never ceiling bulb miss soon drop feel clarify easy night tank door' -g 1 -l 10000000000",
+    "ganache": "ganache-cli -d -m='never ceiling bulb miss soon drop feel clarify easy night tank door'",
     "deploy": "truffle migrate",
     "start": "sirv public --no-clear"
   }

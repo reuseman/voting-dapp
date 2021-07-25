@@ -1,21 +1,51 @@
 const Mayor = artifacts.require("Mayor");
 const SULToken = artifacts.require("SULToken");
+const fs = require("fs");
 
 function write_contract_addresses(mayor, sul) {
-  const fs = require("fs");
-
   const user = {
     mayor: mayor,
     sul: sul,
   };
 
   // write JSON string to a file
-  fs.writeFile("../addresses.json", JSON.stringify(user), (err) => {
-    if (err) {
-      throw err;
+  fs.writeFile(
+    "../frontend/contracts/addresses.json",
+    JSON.stringify(user),
+    (err) => {
+      if (err) {
+        throw err;
+      }
+      console.log("Contract addresses are saved.");
     }
-    console.log("JSON data is saved.");
-  });
+  );
+}
+
+function copy_contracts_to_frontend() {
+  fs.copyFile(
+    "./build/contracts/Mayor.json",
+    "../frontend/contracts/Mayor.json",
+    (err) => {
+      if (err) {
+        console.log("Error while copying Mayor.json");
+        console.log(err);
+      } else {
+        console.log("Mayor contract is saved");
+      }
+    }
+  );
+  fs.copyFile(
+    "./build/contracts/SULToken.json",
+    "../frontend/contracts/SULToken.json",
+    (err) => {
+      if (err) {
+        console.log("Error while copying SULToken.json");
+        console.log(err);
+      } else {
+        console.log("SULToken contract is saved");
+      }
+    }
+  );
 }
 
 module.exports = async function (deployer, network, accounts) {
@@ -34,4 +64,5 @@ module.exports = async function (deployer, network, accounts) {
   await SULTokenIstance.transfer(MayorInstance.address, initialCoins);
 
   write_contract_addresses(MayorInstance.address, SULTokenIstance.address);
+  copy_contracts_to_frontend();
 };

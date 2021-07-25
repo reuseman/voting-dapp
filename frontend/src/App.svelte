@@ -13,9 +13,9 @@
     route,
   } from "./store.js";
 
-  import * as mayorContract from "../../backend/build/contracts/Mayor.json";
-  import * as sulContract from "../../backend/build/contracts/SULToken.json";
-  import * as addresses from "../../addresses.json";
+  import * as mayorContract from "../contracts/Mayor.json";
+  import * as sulContract from "../contracts/SULToken.json";
+  import * as addresses from "../contracts/addresses.json";
 
   // Components
   import Nav from "./components/Nav.svelte";

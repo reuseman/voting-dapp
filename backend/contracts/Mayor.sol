@@ -84,7 +84,7 @@ contract Mayor {
     /// @param _escrow (address) The address of the escrow account
     /// @param _quorum (address) The number of voters required to finalize the confirmation
     constructor(address[] memory _candidates, address payable _escrow, uint32 _quorum, address _SULtoken) {
-        // require(_candidates.length > 0, "The candidates must be at least one"); maybe the errors is here 
+        require(_candidates.length > 0, "The candidates must be at least one");
 
         // Init ERC20 SUL token
         sul = SULToken(_SULtoken);
@@ -99,7 +99,7 @@ contract Mayor {
     }
 
     // @notice Register the voter by sending soul tokens in order to cast the envelope
-    function register() canRegister public {
+    function register() canRegister external {
         sul.transfer(msg.sender, voterSoul);
         registered[msg.sender] = true;
         emit Registered(msg.sender);
@@ -183,7 +183,7 @@ contract Mayor {
 
     }
 
-    function find_candidate_with_max_soul() private returns (address payable, uint) {
+    function find_candidate_with_max_soul() private view returns (address payable, uint) {
         // Check winner
         address probable_winner;
         uint max_soul = 0;
@@ -225,7 +225,7 @@ contract Mayor {
     }
 
     /// @notice Return the number of candidates
-    function candidates_number() public view returns (uint) {
+    function candidates_number() external view returns (uint) {
         return candidates.length;
     }
 

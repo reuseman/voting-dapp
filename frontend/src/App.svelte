@@ -13,8 +13,8 @@
     route,
   } from "./store.js";
 
-  import * as mayorContract from "../../build/contracts/Mayor.json";
-  import * as sulContract from "../../build/contracts/SULToken.json";
+  import * as mayorContract from "../../backend/build/contracts/Mayor.json";
+  import * as sulContract from "../../backend/build/contracts/SULToken.json";
   import * as addresses from "../../addresses.json";
 
   // Components
@@ -118,10 +118,6 @@
     $balance = await sul.methods
       .balanceOf($selectedAccount)
       .call({ from: $selectedAccount });
-
-    console.log(
-      await mayor.methods.candidates_number().call({ from: $selectedAccount })
-    );
 
     let voting_condition = await mayor.methods.voting_condition().call();
     $quorum = voting_condition.quorum;

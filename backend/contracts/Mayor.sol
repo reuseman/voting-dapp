@@ -122,7 +122,7 @@ contract Mayor {
     /// @param _candidate (address) The voting preference
     /// @dev The soul is sent as ERC20 token
     /// @dev Need to recompute the hash to validate the envelope previously casted
-    function open_envelope(uint _sigil, address _candidate) canOpen external payable {        
+    function open_envelope(uint _sigil, address _candidate) canOpen external payable {
         require(envelopes[msg.sender] != 0x0, "The sender has not casted any votes");
         require(souls[msg.sender].soul == 0, "The sender has already opened the envelope");
         
@@ -183,7 +183,7 @@ contract Mayor {
 
     }
 
-    function find_candidate_with_max_soul() private view returns (address payable, uint) {
+    function find_candidate_with_max_soul() private returns (address payable, uint) {
         // Check winner
         address probable_winner;
         uint max_soul = 0;

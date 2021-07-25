@@ -51,7 +51,7 @@ function copy_contracts_to_frontend() {
 module.exports = async function (deployer, network, accounts) {
   // Deploy contracts
   const initialCoins = 100000;
-  const candidates = [accounts[0], accounts[1]];
+  const candidates = [accounts[0], accounts[1], accounts[2]];
   const escrow = accounts[9];
 
   await deployer.deploy(SULToken, initialCoins);

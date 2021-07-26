@@ -1,6 +1,6 @@
 <script>
   import { onMount } from "svelte";
-  import { fade, blur } from "svelte/transition";
+  import { fade } from "svelte/transition";
   import { createEventDispatcher } from "svelte";
   import { avatarProvider } from "./../store";
 
@@ -51,7 +51,9 @@
     {#if voted}
       <i class="right floated check icon blue" transition:fade />
     {/if}
-    <p class="header">{address}</p>
+    <p class="ui header" title={address}>
+      {address}
+    </p>
   </div>
   <div class="extra content">
     <span class="right floated">

@@ -12,7 +12,7 @@ export const winner = writable(0);
 export const candidates_number = writable(0);
 export const candidates = writable([]);
 
-export const voted = writableStorage("voted", "");
+export const voted = writableStorage("voted", {});
 export const route = writableStorage("routes", {});
 
 export const avatarProvider = "https://avatars.dicebear.com/api/avataaars/";

@@ -82,7 +82,7 @@
               soul={candidate.soul}
               hoverEnabled={false}
               winner={candidate.winner}
-              voted={$voted == candidate.address}
+              voted={$voted[$selectedAccount] == candidate.address}
             />
           {/each}
         </div>
@@ -98,7 +98,7 @@
               soul={candidate.soul}
               hoverEnabled={false}
               winner={candidate.winner}
-              voted={$voted == candidate.address}
+              voted={$voted[$selectedAccount] == candidate.address}
             />
           {/each}
         </div>

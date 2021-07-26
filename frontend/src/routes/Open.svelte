@@ -8,7 +8,7 @@
     quorum,
     voted,
   } from "./../store.js";
-  import { selectedAccount, web3 } from "svelte-web3";
+  import { selectedAccount } from "svelte-web3";
 
   import Candidate from "../components/Candidate.svelte";
   import CandidatePlaceholder from "../components/CandidatePlaceholder.svelte";
@@ -39,7 +39,7 @@
         if (res.status && res.events.hasOwnProperty("EnvelopeOpen")) {
           toggleLoader("hide");
           dispatch("opened", { success: true });
-          $voted = event.address;
+          $voted[$selectedAccount] = event.address; //QUI
         } else {
           console.error(res);
           toggleLoader("hide");

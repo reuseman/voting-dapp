@@ -61,8 +61,6 @@
     sul = new $web3.eth.Contract(sulContract.abi, addresses.sul);
     mayor = new $web3.eth.Contract(mayorContract.abi, addresses.mayor);
 
-    window.mayor = mayor;
-
     subscription = $web3.eth.subscribe("logs", {}, (err, event) => {
       if (!err) console.log(event);
     });
@@ -73,11 +71,6 @@
       compute();
     });
   }
-
-  // $: if ($outcome_announced && currentRoute != routes[4]) {
-  //   $route[$selectedAccount] = routes[4];
-  //   changeRoute();
-  // }
 
   async function firstRoute(e) {
     if (e.detail.success) {
